@@ -2,6 +2,8 @@
 #pragma once
 #include <Arduino.h>
 
+#define minSpeed 30
+
 enum connectType {
   General,
   SlotExpander
@@ -29,16 +31,27 @@ public:
     }
 
     void run(int8_t speed) {
-        if(speed >= 0) {
+        speed = constrain(speed, -254, 254);
+        setDir(speed);
+        if(abs(speed) > minSpeed) {
+          digitalWrite(_speedPin, speed);
+          delay(500);
+          digitalWrite(_speedPin, 0);
+        }
+        else {
+          digitalWrite(_speedPin, 0);
+          delay(500);
+        }
+    }
+
+    void setDir(speed) {
+      if(speed > minSpeed) {
             digitalWrite(_dirPin, HIGH);
         }
         else
         {
             digitalWrite(_dirPin, LOW);
         }
-        digitalWrite(_speedPin, speed);
-        delay(1000);
-        digitalWrite(_speedPin, 0);
     }
 
 };

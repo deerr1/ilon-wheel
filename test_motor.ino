@@ -7,8 +7,13 @@
 // #define SPEED A6
 // пин выбора направления движения мотора
 // #define DIR A7
-
+#define MAX_SPEED 170.00
 // Motor motor(A7, A6);
+
+// MotorFL motor();
+// MotorFR motor();
+// MotorBL motor();
+// MotorBR motor();
 
 const char* ssid = "admin";
 const char* password = "12345678";
@@ -20,8 +25,43 @@ void handleRoot() {
   server.send(200, "text/html", s);
 }
 
+float map(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
 void motorSet() {
-  int motorDir = server.arg("dir").toInt();
+  float valLX = server.arg("x1").toFloat();
+  float valLY = server.arg("y1").toFloat();
+  float valRX = server.arg("x2").toFloat();
+  float valRY = server.arg("y2").toFloat();
+
+
+  // int valLX = map(x1, -1.00, 1.00, -MAX_SPEED, MAX_SPEED);
+  // int valLY = map(y1, -1.00, 1.00, -MAX_SPEED, MAX_SPEED);
+  // int valRX = map(x2, -1.00, 1.00, -MAX_SPEED, MAX_SPEED);
+  // int valRY = map(y2, -1.00, 1.00, -MAX_SPEED, MAX_SPEED);
+
+  float dutyFR = valLY + valLX;
+  float dutyFL = valLY - valLX;
+  float dutyBR = valLY - valLX;
+  float dutyBL = valLY + valLX;
+
+  dutyFR += valRY - valRX;
+  dutyFL += valRY + valRX;
+  dutyBR += valRY - valRX;
+  dutyBL += valRY + valRX;
+
+
+  Serial.print(x1);
+  Serial.print(" ");
+  Serial.print(y1);
+  Serial.print(" ");
+  Serial.print(x2);
+  Serial.print(" ");
+  Serial.println(y2);
+  server.send(200);
   // motor.run(125 * motorDir);
   // if (motorDir == 0) {
   //   digitalWrite(DIR, HIGH);
@@ -39,14 +79,8 @@ void motorSet() {
 
 void setup() {
   Serial.begin(9600);
-  // WiFi.mode(WIFI_STA);
-  // WiFi.begin(ssid, password);
   Serial.println(WiFi.softAP(ssid, password) ? "Ready" : "Failed!");
-  // Serial.print("Connecting");
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
+
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
@@ -60,6 +94,5 @@ void setup() {
 }
 
 void loop() {
-  // покрутим в течении 3 секунд мотор в одну сторону
   server.handleClient();
 }
