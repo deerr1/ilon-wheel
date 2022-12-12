@@ -35,16 +35,16 @@ public:
         setDir(speed);
         if(abs(speed) > minSpeed) {
           digitalWrite(_speedPin, speed);
-          delay(500);
-          digitalWrite(_speedPin, 0);
+          // delay(300);
+          // digitalWrite(_speedPin, 0);
         }
         else {
           digitalWrite(_speedPin, 0);
-          delay(500);
+          // delay(300);
         }
     }
 
-    void setDir(speed) {
+    void setDir(int8_t speed) {
       if(speed > minSpeed) {
             digitalWrite(_dirPin, HIGH);
         }
