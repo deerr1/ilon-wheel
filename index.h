@@ -41,6 +41,10 @@ const char webpage[] PROGMEM = R"=====(
         this.onpointerup = function() {
             this.parentNode.onpointermove = null;
             this.onpointerup = null;
+            this.style.left = '50%';
+            this.style.top = '50%';
+            this.x = 0;
+            this.y = 0;
         }
     }
 
