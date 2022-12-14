@@ -3,31 +3,31 @@
 #include <ESP8266WebServer.h>
 #include "Motor.h"
 #include "index.h"
-#include <Wire.h>
-#include <GpioExpander.h>
+// #include <Wire.h>
+// #include <GpioExpander.h>
 
 
 // Передний левый мотор
-#define FLSPEED A6
-#define FLDIR A7
+// #define FLSPEED A6
+// #define FLDIR A7
 // Передний правый мотор
-#define FRSPEED A5
-#define FRDIR A4
+// #define FRSPEED A5
+// #define FRDIR A4
 //Задний левый мотор
-#define BLSPEED 7 //!!! Изменить !!!
-#define BLDIR 2 //!!! Изменить !!!
+// #define BLSPEED 7 //!!! Изменить !!!
+// #define BLDIR 2 //!!! Изменить !!!
 //Задний правый мотор
-#define BRSPEED 1 //!!! Изменить !!!
-#define BRDIR 0 //!!! Изменить !!!
+// #define BRSPEED 1 //!!! Изменить !!!
+// #define BRDIR 0 //!!! Изменить !!!
 //Максимальная скорость
 #define MAX_SPEED 230.00
 
-GpioExpander expander(42);
+// GpioExpander expander(42);
 
-Motor motorFL(FLDIR, FLSPEED);
-Motor motorFR(FRDIR, FRSPEED);
-Motor motorBL(BLDIR, BLSPEED, SlotExpander);
-Motor motorBR(BRDIR, BRSPEED, SlotExpander);
+// Motor motorFL(FLDIR, FLSPEED);
+// Motor motorFR(FRDIR, FRSPEED);
+// Motor motorBL(BLDIR, BLSPEED, SlotExpander);
+// Motor motorBR(BRDIR, BRSPEED, SlotExpander);
 // Motor motorBR;
 
 const char* ssid = "admin";
@@ -61,23 +61,23 @@ void motorSet() {
   // int valRX = -x2;
   // int valRY = y2;
 
-  // float dutyFR = valLY + valLX;
-  // float dutyFL = valLY - valLX;
-  // float dutyBR = valLY - valLX;
-  // float dutyBL = valLY + valLX;
+  float dutyFR = valLY - valLX;
+  float dutyFL = -valLY - valLX;
+  float dutyBR = valLY + valLX;
+  float dutyBL = -valLY + valLX;
 
-  // dutyFR += valRY - valRX;
-  // dutyFL += valRY + valRX;
-  // dutyBR += valRY - valRX;
-  // dutyBL += valRY + valRX;
+  dutyFR += valRY - valRX;
+  dutyFL += -valRY - valRX;
+  dutyBR += valRY - valRX;
+  dutyBL += -valRY - valRX;
 
-  Serial.print(valLX);
+  Serial.print(dutyFR);
   Serial.print(" ");
-  Serial.print(valLY);
+  Serial.print(dutyFL);
   Serial.print(" ");
-  Serial.print(valRX);
+  Serial.print(dutyBR);
   Serial.print(" ");
-  Serial.println(valRY);
+  Serial.println(dutyBL);
 
   // motorFR.run(dutyFR);
   // motorFL.run(dutyFL);
@@ -106,10 +106,10 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/motor_set", motorSet);
   Wire.begin();
-  expander.begin();
+  // expander.begin();
 
-  motorBL.expanderSet(expander);
-  motorBR.expanderSet(expander);
+  // motorBL.expanderSet(expander);
+  // motorBR.expanderSet(expander);
   server.begin();
 
 }
