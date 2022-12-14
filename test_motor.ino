@@ -3,8 +3,8 @@
 #include <ESP8266WebServer.h>
 #include "Motor.h"
 #include "index.h"
-// #include <Wire.h>
-// #include <GpioExpander.h>
+#include <Wire.h>
+#include <GpioExpander.h>
 
 
 // Передний левый мотор
@@ -14,20 +14,21 @@
 #define FRSPEED A5
 #define FRDIR A4
 //Задний левый мотор
-#define BLSPEED A6 //!!! Изменить !!!
-#define BLDIR A7 //!!! Изменить !!!
+#define BLSPEED 7 //!!! Изменить !!!
+#define BLDIR 2 //!!! Изменить !!!
 //Задний правый мотор
-#define BRSPEED A6 //!!! Изменить !!!
-#define BRDIR A7 //!!! Изменить !!!
+#define BRSPEED 1 //!!! Изменить !!!
+#define BRDIR 0 //!!! Изменить !!!
 //Максимальная скорость
-#define MAX_SPEED 170.00
+#define MAX_SPEED 230.00
 
-// GpioExpander expander(42);
+GpioExpander expander(42);
 
-// Motor motorFL(FLDIR, FLSPEED);
-// Motor motorFR(FRDIR, FRSPEED);
-// Motor motorBL(BLDIR, BLSPEED, SlotExpander, expander);
-// Motor motorBR(BRDIR, BRSPEED, SlotExpander, expander);
+Motor motorFL(FLDIR, FLSPEED);
+Motor motorFR(FRDIR, FRSPEED);
+Motor motorBL(BLDIR, BLSPEED, SlotExpander);
+Motor motorBR(BRDIR, BRSPEED, SlotExpander);
+// Motor motorBR;
 
 const char* ssid = "admin";
 const char* password = "12345678";
@@ -55,23 +56,33 @@ void motorSet() {
   int valRX = map(x2, -1.00, 1.00, -MAX_SPEED, MAX_SPEED);
   int valRY = map(y2, 1.00, -1.00, -MAX_SPEED, MAX_SPEED);
 
-  float dutyFR = valLY + valLX;
-  float dutyFL = valLY - valLX;
-  float dutyBR = valLY - valLX;
-  float dutyBL = valLY + valLX;
+  // int valLX = x1;
+  // int valLY = -y1;
+  // int valRX = -x2;
+  // int valRY = y2;
 
-  dutyFR += valRY - valRX;
-  dutyFL += valRY + valRX;
-  dutyBR += valRY - valRX;
-  dutyBL += valRY + valRX;
+  // float dutyFR = valLY + valLX;
+  // float dutyFL = valLY - valLX;
+  // float dutyBR = valLY - valLX;
+  // float dutyBL = valLY + valLX;
 
-  Serial.print(dutyFR);
+  // dutyFR += valRY - valRX;
+  // dutyFL += valRY + valRX;
+  // dutyBR += valRY - valRX;
+  // dutyBL += valRY + valRX;
+
+  Serial.print(valLX);
   Serial.print(" ");
-  Serial.print(dutyFL);
+  Serial.print(valLY);
   Serial.print(" ");
-  Serial.print(dutyBR);
+  Serial.print(valRX);
   Serial.print(" ");
-  Serial.println(dutyBL);
+  Serial.println(valRY);
+
+  // motorFR.run(dutyFR);
+  // motorFL.run(dutyFL);
+  // motorBL.run(dutyBL);
+  // motorBR.run(dutyBR);
 
   // motorFL.run(dutyFL);
   // motorFR.run(dutyFR);
@@ -82,8 +93,8 @@ void motorSet() {
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial) {
-  } 
+  // while (!Serial) {
+  // } 
   Serial.println(WiFi.softAP(ssid, password) ? "Ready" : "Failed!");
 
   Serial.println("");
@@ -94,8 +105,11 @@ void setup() {
 
   server.on("/", handleRoot);
   server.on("/motor_set", motorSet);
-  // Wire.begin();
-  // expander.begin();  !!!Включить
+  Wire.begin();
+  expander.begin();
+
+  motorBL.expanderSet(expander);
+  motorBR.expanderSet(expander);
   server.begin();
 
 }

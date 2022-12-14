@@ -16,9 +16,9 @@ private:
     int8_t _dirPin;
     int8_t _speedPin;
     connectType _type;
-    GpioExpander* _expander;
+    GpioExpander _expander;
 public:
-    Motor(int8_t dirPin, int8_t speedPin, connectType type = General, GpioExpander expander = NULL) {
+    Motor(int8_t dirPin, int8_t speedPin, connectType type = General) {
         _dirPin = dirPin;
         _speedPin = speedPin;
         _type = type;
@@ -27,16 +27,20 @@ public:
           pinMode(_dirPin, OUTPUT);
           pinMode(_speedPin, OUTPUT);
         }
-        else {
-          _expander = &expander;
-          _expander->pinMode(_dirPin, OUTPUT);
-          _expander->pinMode(_speedPin, OUTPUT);
-        }
+    }
+    
+    void expanderSet(GpioExpander &expander) {
+      if(_type == SlotExpander) {        
+        _expander = expander;
+        _expander.pinMode(_dirPin, OUTPUT);
+        _expander.pinMode(_speedPin, OUTPUT);
+      }
     }
 
     void run(int8_t speed) {
         speed = constrain(speed, -254, 254);
         setDir(speed);
+        speed = abs(speed);
         if(abs(speed) > minSpeed) {
           writeAnalog(_speedPin, speed);
           // delay(300);
@@ -63,7 +67,7 @@ public:
         digitalWrite(pin, value);
       }
       else {
-        _expander->digitalWrite(pin, value);
+        _expander.digitalWrite(pin, value);
       }
     }
 
@@ -72,7 +76,7 @@ public:
         analogWrite(pin, value);
       }
       else {
-        _expander->analogWrite(pin, value);
+        _expander.analogWrite(pin, value);
       }
     }
 };
